@@ -424,6 +424,9 @@ function render(){
   if (S.screen === "guest") rGuest();
 }
 
+function member(){ return !!S.meId || (LIVE && S.isAdmin); }
+function lockHTML(what){ return '<div class="card join"><span class="flag" aria-hidden="true"><i></i><i></i><i></i></span><h3>Only for La Famiglia</h3><p>' + what + '</p><button class="btn primary" data-act="join">Join La Famiglia</button></div>'; }
+
 function ctaHTML(){
   var n = upcoming(), b = mine();
   if (!n) return '<button class="btn soft" disabled>Next dinner coming soon</button>';
@@ -452,13 +455,15 @@ function rHome(){
     h += '<article class="card"><div class="next-img"><img src="' + dinnerImg(n) + '" alt="' + esc(KIND[n.kind] || "Dinner") + '"><div class="next-over">';
     h += '<span class="pill-light">Cena n. ' + esc(n.number) + '</span><h2>' + esc(KIND[n.kind] || "Dinner") + '</h2><p>' + esc(when(n)) + '</p></div></div>';
     h += '<div class="next-b"><div class="seats"><div class="bar"><i style="width:' + pct + '%"></i></div><span><b>' + t + '</b> of ' + seats + ' seats taken' + (seats - t > 0 && seats - t <= 5 ? ' · <b style="color:var(--red)">only ' + (seats - t) + ' left</b>' : '') + '</span></div>';
-    if (coming.length) h += stack(coming.map(function(x){ return x.g; }), 34, 7);
+    if (coming.length && member()) h += stack(coming.map(function(x){ return x.g; }), 34, 7);
     h += ctaHTML() + '</div></article>';
   } else {
     h += '<article class="card"><div class="next-img"><img src="img/hero.jpg" alt="A table full of Italian dishes"></div><div class="next-b"><p style="margin:0;color:var(--ink-2)">The next dinner is being cooked up. Check back soon.</p>' + ctaHTML() + '</div></article>';
   }
   h += '<div class="group"><div class="sh"><h3>Stasera<small>Who\'s coming</small></h3><span class="side">' + (n ? plural(t || 0, "seat", "seats") : "") + '</span></div>';
-  if (coming.length) {
+  if (coming.length && !member()) {
+    h += '<div class="empty">' + plural(coming.length, "person is", "people are") + ' coming. Join La Famiglia to see who.</div>';
+  } else if (coming.length) {
     h += '<div class="faces">' + coming.map(function(x){
       var d = D[x.b.main];
       return '<button class="face" data-act="guest" data-id="' + esc(x.g.id) + '">' + av(x.g, 62) + '<span class="nm">' + esc(x.g.name.split(" ")[0]) + (x.b.plus ? ' +' + x.b.plus : '') + '</span><span class="ds">' + esc(d ? d.name : "") + '</span></button>';
@@ -466,7 +471,7 @@ function rHome(){
   } else h += '<div class="empty">' + (n ? "Nobody yet. Be the first at the table." : "No dinner open right now.") + '</div>';
   h += '</div>';
   var lastPh = S.photos.filter(function(p){ return p.status === "approved"; }).sort(function(a,b){ return String(b.created_at).localeCompare(String(a.created_at)); }).slice(0, 12);
-  if (lastPh.length) h += '<div class="group"><div class="sh"><h3>Dall\'archivio<small>Latest photos</small></h3><a class="side" href="#archivio" style="color:var(--green-2);text-decoration:none;font-weight:600">All</a></div><div class="shots">' + lastPh.map(function(p){ return '<button class="shot" data-act="photo" data-id="' + esc(p.id) + '"><img src="' + esc(p.url) + '" alt="Photo from a dinner" loading="lazy"></button>'; }).join("") + '</div></div>';
+  if (lastPh.length && member()) h += '<div class="group"><div class="sh"><h3>Dall\'archivio<small>Latest photos</small></h3><a class="side" href="#archivio" style="color:var(--green-2);text-decoration:none;font-weight:600">All</a></div><div class="shots">' + lastPh.map(function(p){ return '<button class="shot" data-act="photo" data-id="' + esc(p.id) + '"><img src="' + esc(p.url) + '" alt="Photo from a dinner" loading="lazy"></button>'; }).join("") + '</div></div>';
   h += '<div class="tiles"><div class="tile"><b>' + past().length + '</b><span>Cene</span></div><div class="tile"><b>' + S.guests.length + '</b><span>Famiglia</span></div><div class="tile"><b>' + kg.toFixed(1) + '</b><span>Kg di pasta</span></div></div>';
   h += '<div class="card hosts">' + (hosts.length ? stack(hosts, 48, 2) : '') + '<p><b>Your hosts: OMG</b>Osteria Matteo &amp; Giovanni. Also what you\'ll say after the first bite.</p></div>';
   $("#s-home").innerHTML = h;
@@ -499,6 +504,7 @@ function ranked(){
 function rFam(){
   var r = ranked(), top = r.filter(function(x){ return x.n > 0; }).slice(0,3);
   var h = '<header><p class="eb">' + plural(S.guests.length, "member", "members") + '</p><h1 class="lt">La Famiglia</h1></header>';
+  if (!member()) { $("#s-famiglia").innerHTML = h + lockHTML("Everyone's profile, the dinners they came to and their favourite dish. Join to see who's in."); return; }
   if (top.length === 3) {
     var order = [top[1], top[0], top[2]], col = ["var(--silver)","var(--gold)","var(--bronze)"], pos = [2,1,3], size = [64,84,64];
     h += '<div class="card podium">' + order.map(function(x, i){
@@ -515,6 +521,7 @@ function rFam(){
 function rArch(){
   var p = past();
   var h = '<header><p class="eb">' + plural(p.length, "dinner", "dinners") + ' served</p><h1 class="lt">Archivio</h1></header>';
+  if (!member()) { $("#s-archivio").innerHTML = h + lockHTML("Every past dinner with its photos and who was at the table."); return; }
   if (!p.length) h += '<div class="empty">The first dinner will appear here.</div>';
   h += '<div class="arch">' + p.map(function(d){
     var at = bOf(d.id).filter(function(b){ return b.attended !== false; });
@@ -566,7 +573,8 @@ function rMe(){
 function rGuest(){
   var g = guest(S.gid);
   var h = '<button class="back" data-act="back">‹ Famiglia</button>';
-  h += g ? profileHTML(g, g.id === S.meId) : '<div class="empty">This profile does not exist anymore.</div>';
+  if (!member()) h += lockHTML("Profiles are visible to La Famiglia only.");
+  else h += g ? profileHTML(g, g.id === S.meId) : '<div class="empty">This profile does not exist anymore.</div>';
   $("#s-guest").innerHTML = h;
 }
 
@@ -697,6 +705,7 @@ function resizeImg(file, max, q){
   });
 }
 function openDinner(id){
+  if (!member()) return openJoin();
   var d = S.dinners.filter(function(x){ return String(x.id) === String(id); })[0]; if (!d) return;
   var at = bOf(d.id).filter(function(b){ return b.attended !== false; });
   var ph = photosFor(d.id), up = canUpload(d);
@@ -725,6 +734,7 @@ function openDinner(id){
   });
 }
 function openPhoto(id){
+  if (!member()) return openJoin();
   var p = S.photos.filter(function(x){ return String(x.id) === String(id); })[0]; if (!p) return;
   var d = S.dinners.filter(function(x){ return x.id === p.dinner_id; })[0], g = guest(p.guest_id);
   openSheet(d ? "Cena n. " + esc(d.number) : "Photo", '<img class="full" src="' + esc(p.url) + '" alt="">' +
