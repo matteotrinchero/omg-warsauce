@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>OMG Warsauce</title>
+<meta name="description" content="Osteria Matteo &amp; Giovanni. Made in Italy. Cooked in Warsaw.">
+<meta name="theme-color" content="#F6F6F3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="OMG">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<style>
+/* App shell: una colonna larga come un telefono, cinque tab in basso, bottom sheet per le azioni.
+   Fondo chiaro, testo scuro, accenti tricolore. Font di sistema (SF Pro su iPhone, Roboto su Android). */
+:root{
+  --bg:#F6F6F3; --card:#FFFFFF; --ink:#121417; --ink-2:#5C636D; --ink-3:#8B919A;
+  --line:#E7E5E0; --fill:#EFEEEA; --frame:#E9E8E3;
+  --green:#008C45; --green-2:#00733A; --green-soft:#E5F3EA;
+  --red:#CD212A; --red-2:#A8161E; --red-soft:#FBE8E9;
+  --gold:#B8912C; --silver:#8E949C; --bronze:#A8693A;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --tab:64px; --r:20px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{background:var(--frame)}
+body{margin:0;background:var(--frame);font-family:var(--font);color:var(--ink);font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-appearance:none;appearance:none}
+img{display:block;max-width:100%}
+a{color:inherit}
+:focus-visible{outline:3px solid rgba(0,140,69,.45);outline-offset:2px;border-radius:10px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:30}
+
+.app{max-width:480px;margin:0 auto;min-height:100dvh;background:var(--bg);position:relative}
+@media (min-width:560px){.app{box-shadow:0 0 0 1px var(--line),0 30px 80px -40px rgba(18,20,23,.35)}}
+.screen{padding-top:10px;padding-bottom:calc(var(--tab) + 32px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px;align-content:start}
+
+/* testata */
+.flag{display:inline-flex;height:4px;width:36px;border-radius:2px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+.flag i{flex:1;background:var(--green)} .flag i:nth-child(2){background:#fff} .flag i:nth-child(3){background:var(--red)}
+.eb{font-size:13px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;margin:0}
+.lt{font-size:34px;font-weight:800;letter-spacing:-.025em;line-height:1.05;margin:4px 0 0;text-wrap:balance}
+.brand{display:grid;gap:10px;padding-top:6px}
+.wordmark{font-size:44px;font-weight:900;letter-spacing:-.04em;line-height:.92;margin:0}
+.wordmark span{color:var(--green)} .wordmark em{font-style:normal;color:var(--red)}
+.tag{margin:0;color:var(--ink-2);font-size:15px}
+.tag b{color:var(--ink);font-weight:700}
+.demo{justify-self:start;font-size:12px;font-weight:600;color:var(--ink-2);background:var(--fill);padding:5px 10px;border-radius:999px}
+
+/* card prossima cena */
+.card{background:var(--card);border-radius:var(--r);box-shadow:0 1px 2px rgba(18,20,23,.04),0 10px 30px -18px rgba(18,20,23,.22);overflow:hidden}
+.next-img{position:relative;aspect-ratio:4/3;max-width:100%}
+.next-img img{width:100%;height:100%;object-fit:cover}
+.next-over{position:absolute;inset:auto 0 0 0;padding:56px 18px 16px;background:linear-gradient(to top,rgba(10,12,14,.78),rgba(10,12,14,0));color:#fff;display:grid;gap:4px}
+.next-over h2{margin:0;font-size:28px;font-weight:800;letter-spacing:-.02em}
+.next-over p{margin:0;font-size:15px;opacity:.92}
+.pill-light{justify-self:start;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:rgba(255,255,255,.92);color:var(--ink);padding:4px 9px;border-radius:999px}
+.next-b{padding:16px;display:grid;gap:14px}
+.seats{display:grid;gap:7px;font-size:14px;color:var(--ink-2)}
+.seats b{color:var(--ink)}
+.bar{height:8px;border-radius:999px;background:var(--fill);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--green) 60%,var(--red))}
+.stack{display:flex;align-items:center}
+.stack .av{margin-left:-10px;box-shadow:0 0 0 2.5px var(--card)} .stack .av:first-child{margin-left:0}
+.stack .more{margin-left:8px;font-size:13px;color:var(--ink-2);font-weight:600}
+
+/* bottoni */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;border:0;border-radius:14px;font-size:16px;font-weight:700;padding:0 18px;text-decoration:none;transition:transform .12s, opacity .12s}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--green);color:#fff}
+.btn.ok{background:var(--green-soft);color:var(--green-2)}
+.btn.soft{background:var(--fill);color:var(--ink)}
+.btn.danger{background:var(--red-soft);color:var(--red-2)}
+.btn[disabled]{opacity:.45;cursor:default;transform:none}
+.link{background:none;border:0;color:var(--green-2);font-weight:600;padding:6px 0;font-size:15px}
+
+/* sezioni */
+.sh{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.sh h3{margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em}
+.sh h3 small{font-size:14px;font-weight:600;color:var(--ink-3);margin-left:6px;letter-spacing:0}
+.sh .side{font-size:14px;color:var(--ink-3)}
+.group{display:grid;gap:12px}
+
+/* chi viene */
+.faces{display:flex;gap:14px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.faces::-webkit-scrollbar{display:none}
+.face{flex:none;width:68px;display:grid;justify-items:center;gap:4px;background:none;border:0;padding:0;text-align:center}
+.face .nm{font-size:13px;font-weight:600;max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.face .ds{font-size:11px;color:var(--ink-3);max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:-3px}
+.empty{background:var(--card);border-radius:16px;padding:18px;color:var(--ink-2);font-size:15px;text-align:center;border:1px dashed var(--line)}
+
+.av{display:inline-grid;place-items:center;border-radius:50%;object-fit:cover;flex:none;font-weight:700;letter-spacing:-.02em;background:var(--fill)}
+.ring{padding:3px;border-radius:50%;background:conic-gradient(var(--green) 0 33.3%,#fff 0 66.6%,var(--red) 0);display:inline-grid}
+.ring .av{box-shadow:0 0 0 3px var(--card)}
+
+/* numeri */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{background:var(--card);border-radius:16px;padding:14px 12px;display:grid;gap:2px;min-width:0}
+.tile b{font-size:24px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile span{font-size:12px;color:var(--ink-3);font-weight:600}
+.tile.text b{font-size:15px;line-height:1.25;white-space:normal}
+
+.hosts{display:flex;align-items:center;gap:14px;padding:16px}
+.hosts p{margin:0;font-size:14px;color:var(--ink-2)}
+.hosts p b{display:block;color:var(--ink);font-size:16px}
+
+/* menu */
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--fill);border-radius:12px;padding:3px}
+.seg button{border:0;background:transparent;border-radius:9px;padding:8px 0;font-size:14px;font-weight:600;color:var(--ink-2)}
+.seg button[aria-selected="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(18,20,23,.12)}
+.mh{display:flex;align-items:baseline;gap:8px;margin:6px 0 0}
+.mh b{font-size:24px;font-weight:900;letter-spacing:.02em}
+.mh small{font-size:14px;font-weight:600;font-style:italic}
+.mh.main small{color:var(--green-2)} .mh.side small{color:var(--red)}
+.dish{display:grid}
+.dish-img{position:relative;aspect-ratio:16/10;max-width:100%;background:var(--fill)}
+.dish-img img{width:100%;height:100%;object-fit:cover}
+.badge{position:absolute;top:10px;left:10px;background:var(--green);color:#fff;font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px}
+.dish-b{padding:12px 14px 14px;display:grid;gap:4px}
+.dish-t{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.dish-t h4{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em;min-width:0}
+.cnt{font-size:12px;color:var(--ink-3);font-weight:600;white-space:nowrap}
+.dish-b p{margin:0;color:var(--ink-2);font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chip{font-size:12px;font-weight:600;padding:3px 8px;border-radius:999px;background:var(--fill);color:var(--ink-2)}
+.chip.g{background:var(--green-soft);color:var(--green-2)} .chip.r{background:var(--red-soft);color:var(--red-2)}
+.sides{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sides .dish-img{aspect-ratio:1/1}
+.sides .dish-b{padding:10px 12px 12px}
+.sides .dish-t h4{font-size:15px}
+.drinks{display:grid}
+.drink{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-top:1px solid var(--line);font-size:16px}
+.drink:first-child{border-top:0}
+.drink span{color:var(--ink-3);font-size:13px;font-style:italic}
+
+/* famiglia */
+.podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;align-items:end;gap:8px;padding:18px 12px 16px}
+.pod{display:grid;justify-items:center;gap:6px;text-align:center;background:none;border:0;padding:0;min-width:0}
+.pod .nm{font-size:14px;font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pod .ct{font-size:12px;color:var(--ink-3);font-weight:600}
+.rank{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;color:#fff;font-size:12px;font-weight:800;margin-top:-16px;position:relative;box-shadow:0 0 0 2px var(--card)}
+.fam{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 10px}
+.mem{display:grid;justify-items:center;gap:5px;background:none;border:0;padding:0;text-align:center;min-width:0}
+.mem .nm{font-size:14px;font-weight:600;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mem .ct{font-size:12px;color:var(--ink-3);margin-top:-3px}
+.host{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--red);}
+
+/* archivio */
+.arch{display:grid;gap:12px}
+.ad{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;padding:12px;background:var(--card);border:0;border-radius:18px;text-align:left;width:100%;box-shadow:0 1px 2px rgba(18,20,23,.04)}
+.ad img{width:64px;height:64px;border-radius:14px;object-fit:cover}
+.ad .t{display:block;font-size:16px;font-weight:700}
+.ad .m{display:block;margin:2px 0 6px;font-size:13px;color:var(--ink-2)}
+.ad>span{min-width:0}
+.ad .stack .av{box-shadow:0 0 0 2px var(--card);margin-left:-6px}
+.ad .stack .av:first-child{margin-left:0}
+.chev{color:var(--ink-3);font-size:22px;line-height:1}
+
+/* profilo */
+.back{justify-self:start;display:inline-flex;align-items:center;gap:2px;background:none;border:0;color:var(--green-2);font-size:17px;font-weight:500;padding:4px 0}
+.prof{display:grid;justify-items:center;text-align:center;gap:6px;padding-top:6px}
+.prof h2{margin:6px 0 0;font-size:26px;font-weight:800;letter-spacing:-.02em}
+.prof .ig{color:var(--green-2);font-weight:600;text-decoration:none;font-size:15px}
+.prof .bio{margin:4px 0 0;color:var(--ink-2);font-size:15px;max-width:34ch}
+.badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.stamps{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:16px}
+.stamp{aspect-ratio:1;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;color:var(--ink-3);font-size:12px;font-weight:700;max-width:100%}
+.stamp.on{border:2px solid var(--green);background:var(--green-soft);color:var(--green-2)}
+.stamp.on:nth-child(3n+2){border-color:var(--red);background:var(--red-soft);color:var(--red-2)}
+.lvl{padding:0 16px 14px;font-size:13px;color:var(--ink-2)}
+.hist{display:grid}
+.hi{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:center;padding:12px 14px;border-top:1px solid var(--line)}
+.hi:first-child{border-top:0}
+.hi img{width:52px;height:52px;border-radius:12px;object-fit:cover}
+.hi b{font-size:15px;display:block}
+.hi em{font-style:normal;font-weight:500;color:var(--ink-3)}
+.hi small{display:block;font-size:13px;color:var(--ink-2)}
+.join{padding:22px 18px;display:grid;gap:12px;text-align:center;justify-items:center}
+.join h3{margin:0;font-size:22px;font-weight:800}
+.join p{margin:0;color:var(--ink-2);font-size:15px}
+.fine{font-size:12px;color:var(--ink-3);text-align:center;margin:0;display:grid;gap:4px}
+.fine b{color:var(--ink-2)}
+
+/* tab bar */
+.tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:20;display:grid;grid-template-columns:repeat(5,1fr);background:rgba(255,255,255,.9);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(4px,env(safe-area-inset-left,0px));padding-right:max(4px,env(safe-area-inset-right,0px))}
+.tabs a{height:var(--tab);display:grid;justify-items:center;align-content:center;gap:3px;text-decoration:none;color:var(--ink-3);font-size:11px;font-weight:600}
+.tabs a svg{width:25px;height:25px}
+.tabs a[aria-current="page"]{color:var(--green)}
+.tabs .tav{width:26px;height:26px;border-radius:50%;overflow:hidden;display:grid}
+.tabs a[aria-current="page"] .tav{box-shadow:0 0 0 2px var(--green)}
+
+/* sheet */
+.sheet-wrap{position:fixed;inset:0;z-index:40;background:rgba(18,20,23,.42);display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:480px;max-height:92dvh;overflow-y:auto;overscroll-behavior:contain;background:var(--bg);border-radius:22px 22px 0 0;padding-top:8px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));animation:up .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+.grab{width:38px;height:5px;border-radius:3px;background:#D6D4CE;margin:0 auto 10px}
+.sh-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.sh-top h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em}
+.x{width:32px;height:32px;border-radius:50%;border:0;background:var(--fill);color:var(--ink-2);font-size:18px;line-height:1;display:grid;place-items:center;flex:none}
+form{display:grid;gap:16px}
+.field{display:grid;gap:6px}
+.field>label,.lab{font-size:13px;font-weight:600;color:var(--ink-2)}
+.in{width:100%;border:0;background:var(--card);border-radius:12px;padding:13px 14px;font-size:16px;box-shadow:inset 0 0 0 1px var(--line)}
+.in:focus{outline:none;box-shadow:inset 0 0 0 2px var(--green)}
+textarea.in{resize:vertical;min-height:84px}
+.igin{display:flex;align-items:center;background:var(--card);border-radius:12px;box-shadow:inset 0 0 0 1px var(--line)}
+.igin span{padding-left:14px;color:var(--ink-3);font-weight:600}
+.igin .in{box-shadow:none;background:transparent;padding-left:4px}
+.igin:focus-within{box-shadow:inset 0 0 0 2px var(--green)}
+.pick{display:grid;justify-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:600;color:var(--green-2)}
+.pick .pp{width:104px;height:104px;border-radius:50%;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line);display:grid;place-items:center;overflow:hidden;color:var(--ink-3)}
+.pick .pp img{width:100%;height:100%;object-fit:cover}
+.check{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;font-size:14px;color:var(--ink-2)}
+.check input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--green)}
+.err{margin:0;color:var(--red-2);font-weight:600;font-size:14px}
+.opts{display:grid;gap:8px}
+.opt{position:relative;display:block}
+.opt input{position:absolute;opacity:0;width:1px;height:1px}
+.opt .o{display:grid;grid-template-columns:52px 1fr 22px;gap:12px;align-items:center;background:var(--card);border-radius:14px;padding:8px 12px 8px 8px;box-shadow:inset 0 0 0 1px var(--line);cursor:pointer}
+.opt .o img{width:52px;height:52px;border-radius:10px;object-fit:cover}
+.opt .o b{display:block;font-size:15px}
+.opt .o small{display:block;font-size:12px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.opt .o span{min-width:0}
+.opt .tick{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--line);display:grid;place-items:center;color:#fff;font-size:13px}
+.opt input:checked + .o{box-shadow:inset 0 0 0 2px var(--green)}
+.opt input:checked + .o .tick{background:var(--green);box-shadow:none}
+.opt input:focus-visible + .o{outline:3px solid rgba(0,140,69,.45);outline-offset:2px}
+.opt.noimg .o{grid-template-columns:1fr 22px;padding:14px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pl{position:relative}
+.pl input{position:absolute;opacity:0;width:1px;height:1px}
+.pl span{display:inline-block;padding:9px 14px;border-radius:999px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line);font-size:14px;font-weight:600;cursor:pointer}
+.pl input:checked + span{background:var(--green);color:#fff;box-shadow:none}
+.pl input:focus-visible + span{outline:3px solid rgba(0,140,69,.45);outline-offset:2px}
+
+/* biglietto */
+.ticket{position:relative;background:var(--card);border-radius:18px;padding:20px 18px;display:grid;gap:10px;box-shadow:0 10px 30px -18px rgba(18,20,23,.3);
+  -webkit-mask:radial-gradient(circle 11px at 0 108px,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 11px at 100% 108px,#0000 98%,#000) right/51% 100% no-repeat;
+          mask:radial-gradient(circle 11px at 0 108px,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 11px at 100% 108px,#0000 98%,#000) right/51% 100% no-repeat}
+.ticket .tk-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;min-height:76px}
+.ticket .tk-h b{font-size:22px;font-weight:900;letter-spacing:-.03em;line-height:1}
+.ticket .tk-h b span{color:var(--green)} .ticket .tk-h b em{font-style:normal;color:var(--red)}
+.ticket .tk-h small{display:block;font-size:12px;color:var(--ink-3);margin-top:6px}
+.dop{transform:rotate(-9deg);border:2px solid var(--red);color:var(--red);border-radius:8px;padding:4px 8px;text-align:center;font-weight:900;font-size:16px;line-height:1;flex:none}
+.dop small{display:block;font-size:7.5px;font-weight:700;letter-spacing:.04em;margin-top:3px;color:var(--red)}
+.cut{border-top:2px dashed var(--line);margin:4px -18px}
+.row{display:flex;justify-content:space-between;gap:12px;font-size:15px}
+.row span{color:var(--ink-3)}
+.row b{text-align:right;min-width:0;overflow-wrap:anywhere;font-weight:600}
+.ticket .no{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums;text-align:center;letter-spacing:.12em;margin-top:4px}
+
+/* foto */
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;border-radius:16px;overflow:hidden}
+.gal button{padding:0;border:0;background:var(--fill);aspect-ratio:1/1;position:relative;display:block;max-width:100%}
+.gal img{width:100%;height:100%;object-fit:cover}
+.pend{position:absolute;left:6px;bottom:6px;font-size:10px;font-weight:800;background:rgba(255,255,255,.94);color:var(--ink-2);padding:2px 7px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}
+.full{width:100%;border-radius:16px;background:var(--fill)}
+.shots{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.shots::-webkit-scrollbar{display:none}
+.shot{flex:none;width:132px;height:132px;border-radius:16px;overflow:hidden;border:0;padding:0;background:var(--fill)}
+.shot img{width:100%;height:100%;object-fit:cover}
+.mod{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mod figure{margin:0;background:var(--card);border-radius:14px;overflow:hidden;min-width:0}
+.mod img{width:100%;aspect-ratio:1/1;object-fit:cover}
+.mod figcaption{padding:8px;display:grid;gap:6px;font-size:12px;color:var(--ink-2)}
+.mod .acts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+/* admin */
+.list{display:grid}
+.li{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-top:1px solid var(--line)}
+.li:first-child{border-top:0}
+.li b{font-size:15px;display:block}
+.li small{font-size:12px;color:var(--ink-3);display:block}
+.li .acts{display:flex;gap:6px;align-items:center}
+.mini{border:0;border-radius:10px;padding:7px 10px;font-size:12px;font-weight:700;background:var(--fill);color:var(--ink-2)}
+.mini.on{background:var(--green-soft);color:var(--green-2)}
+.mini.del{background:var(--red-soft);color:var(--red-2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.shop{display:grid;gap:4px;padding:14px 16px;font-size:15px}
+.shop .row b{font-variant-numeric:tabular-nums}
+.note{font-size:13px;color:var(--ink-3);margin:0}
+.tip{font-size:13px;line-height:1.4;color:var(--green-2);background:var(--green-soft);border-radius:12px;padding:10px 12px;margin:0}
+.tip.warn{color:var(--red-2);background:var(--red-soft)}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tab) + 14px + env(safe-area-inset-bottom,0px));z-index:50;background:var(--ink);color:#fff;font-size:14px;font-weight:600;padding:11px 16px;border-radius:999px;max-width:calc(100% - 32px);text-align:center;box-shadow:0 10px 30px -10px rgba(0,0,0,.4)}
+.loading{padding:80px 16px;text-align:center;color:var(--ink-3)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="app" id="app">
+  <section class="screen" id="s-home" data-screen="home"><p class="loading">Loading…</p></section>
+  <section class="screen" id="s-menu" data-screen="menu" hidden></section>
+  <section class="screen" id="s-famiglia" data-screen="famiglia" hidden></section>
+  <section class="screen" id="s-archivio" data-screen="archivio" hidden></section>
+  <section class="screen" id="s-me" data-screen="me" hidden></section>
+  <section class="screen" id="s-guest" data-screen="guest" hidden></section>
+</div>
+
+<nav class="tabs" aria-label="Main">
+  <a href="#home" data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 10.2 12 3.5l8.5 6.7V19a1.5 1.5 0 0 1-1.5 1.5h-4.2v-6h-5.6v6H5A1.5 1.5 0 0 1 3.5 19z"/></svg>Stasera</a>
+  <a href="#menu" data-tab="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v7m-2.5-7v4.2a2.5 2.5 0 0 0 5 0V3M7 10.5V21M17.5 3c-2.4 1.6-3 4.6-3 7.3 0 1.3 1 2.2 2.2 2.2h.8V21"/></svg>Menu</a>
+  <a href="#famiglia" data-tab="famiglia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2"/><path d="M3 19.5c.6-3.3 3-5.3 6-5.3s5.4 2 6 5.3"/><circle cx="17" cy="9.5" r="2.5"/><path d="M16.5 14.4c2.3.2 4 1.8 4.5 4.6"/></svg>Famiglia</a>
+  <a href="#archivio" data-tab="archivio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4M8 13.5h3M8 16.5h6"/></svg>Archivio</a>
+  <a href="#me" data-tab="me"><span class="tav" id="tab-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3.2"/><path d="M6.2 18.3c1.3-2.2 3.3-3.4 5.8-3.4s4.5 1.2 5.8 3.4"/></svg></span>Profilo</a>
+</nav>
+
+<div class="sheet-wrap" id="sheet-wrap" hidden>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"></div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="config.js"></script>
+<script>
+(function(){
+"use strict";
+var CFG = window.OMG_CONFIG || {};
+var LIVE = !!(CFG.supabaseUrl && CFG.supabaseAnonKey);
+var UA = navigator.userAgent || "";
+var INAPP = /Instagram|FBAN|FBAV|FB_IAB|FBIOS|Messenger|TikTok|musical_ly|Bytedance|Snapchat|LinkedInApp|Line\//i.test(UA);
+var IOS = /iPhone|iPad|iPod/i.test(UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+function standalone(){ try { return navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches; } catch(e){ return false; } }
+function joinTip(){
+  if (INAPP) return '<p class="tip warn">Open this page in Safari or Chrome first (tap ••• > Open in browser). Your profile stays in the browser you sign up from.</p>';
+  if (IOS && !standalone()) return '<p class="tip">Tip: first tap Share > Add to Home Screen, then sign up from the OMG icon. Your profile stays where you sign up.</p>';
+  return "";
+}
+
+/* ---------- Carta ---------- */
+var DISHES = [
+  {id:"carbonara", sec:"main", kind:"pasta", name:"Carbonara", desc:"Guanciale, egg yolks, pecorino, black pepper. No cream. Ever.", tags:[["Roma",""]]},
+  {id:"amatriciana", sec:"main", kind:"pasta", name:"Amatriciana", desc:"Guanciale, tomato, pecorino. The Roman classic.", tags:[["Roma",""]]},
+  {id:"ragu", sec:"main", kind:"pasta", name:"Pasta al ragù", desc:"Slow-cooked bolognese ragù, parmigiano on top.", tags:[["Bologna",""]]},
+  {id:"tortellini", sec:"main", kind:"pasta", name:"Tortellini", desc:"Bologna's little treasures. Sauce of the night.", tags:[["Bologna",""]]},
+  {id:"aglio-olio", sec:"main", kind:"pasta", name:"Aglio, olio e peperoncino", desc:"Garlic, olive oil, chili. The midnight pasta.", tags:[["Vegan","g"],["Spicy",""]]},
+  {id:"bruschette", sec:"main", kind:"other", name:"Bruschette", desc:"Grilled bread, fresh tomatoes, basil, good olive oil.", tags:[["Vegan","g"]]},
+  {id:"pizza", sec:"main", kind:"pinsa", name:"Pizza", desc:"Pinsa base, topped by the chefs. Ask what's on tonight.", tags:[["Pinsa","r"]]},
+  {id:"patate", sec:"side", name:"Patate al forno", desc:"Roast potatoes, rosemary, crispy edges.", tags:[]},
+  {id:"verdure", sec:"side", name:"Verdure grigliate", desc:"Zucchini, eggplant, peppers, olive oil.", tags:[]},
+  {id:"contorno", sec:"side", name:"Contorno del giorno", desc:"The side of the day. The chefs decide.", tags:[]}
+];
+var DRINKS = [
+  {id:"rosso", name:"Vino rosso"}, {id:"bianco", name:"Vino bianco"}, {id:"spritz", name:"Aperol Spritz"},
+  {id:"negroni", name:"Negroni"}, {id:"birra", name:"Birra"}, {id:"limoncello", name:"Limoncello", note:"extra life"},
+  {id:"zero", name:"Analcolico", note:"water, juice, dignity"}
+];
+var LEVELS = [
+  {min:0, name:"New in town"}, {min:1, name:"Ospite"}, {min:3, name:"Amico della casa"},
+  {min:5, name:"Nonno della carbonara"}, {min:10, name:"Cittadino onorario"}
+];
+var KIND = {pasta:"Pasta night", pizza:"Pizza night", mixed:"Pasta & pizza night"};
+var D = {}; DISHES.forEach(function(d){ D[d.id]=d; });
+var DR = {}; DRINKS.forEach(function(d){ DR[d.id]=d; });
+function img(id){ return "img/" + id + ".jpg"; }
+
+/* ---------- Utility ---------- */
+function $(s, r){ return (r||document).querySelector(s); }
+function $$(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function fmt(iso, o){ if(!iso) return "Date TBA"; try { return new Intl.DateTimeFormat("en-GB", o).format(new Date(iso)); } catch(e){ return String(iso); } }
+function fDay(iso){ return fmt(iso, {weekday:"short", day:"numeric", month:"short"}); }
+function fTime(iso){ return iso ? fmt(iso, {hour:"2-digit", minute:"2-digit"}) : ""; }
+function when(d){ return d.starts_at ? fDay(d.starts_at) + " · " + fTime(d.starts_at) : "Date TBA"; }
+function plural(n, a, b){ return n + " " + (n === 1 ? a : b); }
+function tnum(id){ var h = 7; String(id).split("").forEach(function(c){ h = (h*31 + c.charCodeAt(0)) % 9000; }); return String(1000 + h); }
+
+var S = {guests:[], dinners:[], bookings:[], photos:[], meId:null, isAdmin:false, email:null, menu:"tonight", screen:"home", gid:null, last:"home", ready:false};
+
+function guest(id){ for (var i=0;i<S.guests.length;i++) if (S.guests[i].id === id) return S.guests[i]; return null; }
+function upcoming(){ return S.dinners.filter(function(d){ return d.status !== "done"; }).sort(function(a,b){ return a.number - b.number; })[0] || null; }
+function past(){ return S.dinners.filter(function(d){ return d.status === "done"; }).sort(function(a,b){ return b.number - a.number; }); }
+function doneSet(){ var s = {}; past().forEach(function(d){ s[d.id] = d; }); return s; }
+function bOf(did){ return S.bookings.filter(function(b){ return b.dinner_id === did; }); }
+function taken(d, except){ return bOf(d.id).filter(function(b){ return b.id !== except; }).reduce(function(n,b){ return n + 1 + (b.plus||0); }, 0); }
+function mine(){ var n = upcoming(); if (!n || !S.meId) return null; return bOf(n.id).filter(function(b){ return b.guest_id === S.meId; })[0] || null; }
+function attended(gid){ var ds = doneSet(); return S.bookings.filter(function(b){ return b.guest_id === gid && ds[b.dinner_id] && b.attended !== false; }); }
+function level(n){ var l = LEVELS[0]; LEVELS.forEach(function(x){ if (n >= x.min) l = x; }); return l; }
+function fav(gid){ var c = {}; attended(gid).forEach(function(b){ if (b.main) c[b.main] = (c[b.main]||0) + 1; }); var top = Object.keys(c).sort(function(a,b){ return c[b]-c[a]; })[0]; return top ? D[top] : null; }
+function orders(id){ var ds = doneSet(); return S.bookings.filter(function(b){ return ds[b.dinner_id] && b.attended !== false && (b.main === id || b.side === id); }).reduce(function(n,b){ return n + 1 + (b.plus||0); }, 0); }
+function dinnerDishes(n, sec){ var list = (n && n.dishes && n.dishes.length) ? n.dishes : DISHES.map(function(d){ return d.id; }); return list.map(function(id){ return D[id]; }).filter(function(d){ return d && d.sec === sec; }); }
+function dinnerImg(d){ return d && d.kind === "pizza" ? "img/pizza.jpg" : "img/hero.jpg"; }
+function topDish(d){ var c = {}; bOf(d.id).forEach(function(b){ if (b.attended !== false && b.main) c[b.main] = (c[b.main]||0) + 1 + (b.plus||0); }); var t = Object.keys(c).sort(function(a,b){ return c[b]-c[a]; })[0]; return t ? D[t] : null; }
+
+function approvedOf(did){ return S.photos.filter(function(p){ return p.dinner_id === did && p.status === "approved"; }); }
+var TINTS = [["#E5F3EA","#00733A"],["#FBE8E9","#A8161E"],["#ECEEF1","#3A4250"]];
+function av(g, size, cls){
+  size = size || 48; if (!g) return "";
+  var s = "width:" + size + "px;height:" + size + "px";
+  if (g.photo_url) return '<img class="av ' + (cls||"") + '" style="' + s + '" src="' + esc(g.photo_url) + '" alt="' + esc(g.name) + '" loading="lazy">';
+  var ini = String(g.name || "?").trim().split(/\s+/).map(function(w){ return w.charAt(0); }).slice(0,2).join("").toUpperCase();
+  var h = 0; String(g.id).split("").forEach(function(c){ h = (h*31 + c.charCodeAt(0)) >>> 0; });
+  var t = TINTS[h % 3];
+  return '<span class="av ' + (cls||"") + '" style="' + s + ';background:' + t[0] + ';color:' + t[1] + ';font-size:' + Math.round(size*0.38) + 'px" role="img" aria-label="' + esc(g.name) + '">' + esc(ini) + '</span>';
+}
+function stack(list, size, max){
+  max = max || 6;
+  var shown = list.slice(0, max).map(function(g){ return av(g, size); }).join("");
+  var more = list.length > max ? '<span class="more">+' + (list.length - max) + '</span>' : "";
+  return '<span class="stack">' + shown + more + '</span>';
+}
+function cleanIg(v){ v = String(v||"").trim().replace(/^@/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//i, "").replace(/[/?#].*$/, ""); return /^[A-Za-z0-9._]{1,30}$/.test(v) ? v : ""; }
+function brandHTML(){ return '<b><span>OMG</span> WARSAUCE</b>'; }
+
+/* ---------- Render ---------- */
+function render(){
+  if (!S.ready) return;
+  $$(".screen").forEach(function(el){ el.hidden = el.dataset.screen !== S.screen; });
+  var tab = S.screen === "guest" ? "famiglia" : S.screen;
+  $$(".tabs a").forEach(function(a){ if (a.dataset.tab === tab) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  var me = guest(S.meId);
+  $("#tab-av").innerHTML = me ? av(me, 26) : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" style="width:26px;height:26px"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3.2"/><path d="M6.2 18.3c1.3-2.2 3.3-3.4 5.8-3.4s4.5 1.2 5.8 3.4"/></svg>';
+  if (S.screen === "home") rHome();
+  if (S.screen === "menu") rMenu();
+  if (S.screen === "famiglia") rFam();
+  if (S.screen === "archivio") rArch();
+  if (S.screen === "me") rMe();
+  if (S.screen === "guest") rGuest();
+}
+
+function ctaHTML(){
+  var n = upcoming(), b = mine();
+  if (!n) return '<button class="btn soft" disabled>Next dinner coming soon</button>';
+  if (b) return '<button class="btn ok" data-act="ticket">You\'re in · See your ticket</button>';
+  if (n.status === "closed") return '<button class="btn soft" disabled>Bookings closed</button>';
+  if (!S.meId) return '<button class="btn primary" data-act="join-book">Join La Famiglia to book</button>';
+  if (taken(n) >= (n.seats||20)) return '<button class="btn soft" disabled>Sold out</button>';
+  return '<button class="btn primary" data-act="book">Prenota · Book your seat</button>';
+}
+
+function rHome(){
+  var n = upcoming(), all = n ? bOf(n.id) : [];
+  var coming = all.map(function(b){ return {b:b, g:guest(b.guest_id)}; }).filter(function(x){ return x.g; });
+  var hosts = S.guests.filter(function(g){ return g.is_host; });
+  var ds = doneSet();
+  var doneB = S.bookings.filter(function(b){ return ds[b.dinner_id] && b.attended !== false; });
+  var kg = doneB.reduce(function(s,b){ return s + (D[b.main] && D[b.main].kind === "pasta" ? (1 + (b.plus||0)) * 0.11 : 0); }, 0);
+  var h = '';
+  h += '<header class="brand">';
+  if (!LIVE) h += '<span class="demo">Demo preview · example data</span>';
+  h += '<span class="flag" aria-hidden="true"><i></i><i></i><i></i></span>';
+  h += '<h1 class="wordmark"><span>OMG</span><br>WARSAUCE</h1>';
+  h += '<p class="tag"><b>Osteria Matteo &amp; Giovanni</b><br>Made in Italy. Cooked in Warsaw.</p></header>';
+  if (n) {
+    var t = taken(n), seats = n.seats || 20, pct = Math.min(100, Math.round(t / seats * 100));
+    h += '<article class="card"><div class="next-img"><img src="' + dinnerImg(n) + '" alt="' + esc(KIND[n.kind] || "Dinner") + '"><div class="next-over">';
+    h += '<span class="pill-light">Cena n. ' + esc(n.number) + '</span><h2>' + esc(KIND[n.kind] || "Dinner") + '</h2><p>' + esc(when(n)) + '</p></div></div>';
+    h += '<div class="next-b"><div class="seats"><div class="bar"><i style="width:' + pct + '%"></i></div><span><b>' + t + '</b> of ' + seats + ' seats taken' + (seats - t > 0 && seats - t <= 5 ? ' · <b style="color:var(--red)">only ' + (seats - t) + ' left</b>' : '') + '</span></div>';
+    if (coming.length) h += stack(coming.map(function(x){ return x.g; }), 34, 7);
+    h += ctaHTML() + '</div></article>';
+  } else {
+    h += '<article class="card"><div class="next-img"><img src="img/hero.jpg" alt="A table full of Italian dishes"></div><div class="next-b"><p style="margin:0;color:var(--ink-2)">The next dinner is being cooked up. Check back soon.</p>' + ctaHTML() + '</div></article>';
+  }
+  h += '<div class="group"><div class="sh"><h3>Stasera<small>Who\'s coming</small></h3><span class="side">' + (n ? plural(t || 0, "seat", "seats") : "") + '</span></div>';
+  if (coming.length) {
+    h += '<div class="faces">' + coming.map(function(x){
+      var d = D[x.b.main];
+      return '<button class="face" data-act="guest" data-id="' + esc(x.g.id) + '">' + av(x.g, 62) + '<span class="nm">' + esc(x.g.name.split(" ")[0]) + (x.b.plus ? ' +' + x.b.plus : '') + '</span><span class="ds">' + esc(d ? d.name : "") + '</span></button>';
+    }).join("") + '</div>';
+  } else h += '<div class="empty">' + (n ? "Nobody yet. Be the first at the table." : "No dinner open right now.") + '</div>';
+  h += '</div>';
+  var lastPh = S.photos.filter(function(p){ return p.status === "approved"; }).sort(function(a,b){ return String(b.created_at).localeCompare(String(a.created_at)); }).slice(0, 12);
+  if (lastPh.length) h += '<div class="group"><div class="sh"><h3>Dall\'archivio<small>Latest photos</small></h3><a class="side" href="#archivio" style="color:var(--green-2);text-decoration:none;font-weight:600">All</a></div><div class="shots">' + lastPh.map(function(p){ return '<button class="shot" data-act="photo" data-id="' + esc(p.id) + '"><img src="' + esc(p.url) + '" alt="Photo from a dinner" loading="lazy"></button>'; }).join("") + '</div></div>';
+  h += '<div class="tiles"><div class="tile"><b>' + past().length + '</b><span>Cene</span></div><div class="tile"><b>' + S.guests.length + '</b><span>Famiglia</span></div><div class="tile"><b>' + kg.toFixed(1) + '</b><span>Kg di pasta</span></div></div>';
+  h += '<div class="card hosts">' + (hosts.length ? stack(hosts, 48, 2) : '') + '<p><b>Your hosts: OMG</b>Osteria Matteo &amp; Giovanni. Also what you\'ll say after the first bite.</p></div>';
+  $("#s-home").innerHTML = h;
+}
+
+function dishCard(d, badge, small){
+  var c = orders(d.id);
+  return '<article class="card dish"><div class="dish-img"><img src="' + img(d.id) + '" alt="' + esc(d.name) + '" loading="lazy">' + (badge ? '<span class="badge">Tonight</span>' : '') + '</div>' +
+    '<div class="dish-b"><div class="dish-t"><h4>' + esc(d.name) + '</h4>' + (c ? '<span class="cnt">' + c + '× served</span>' : '') + '</div>' +
+    (small ? '' : '<p>' + esc(d.desc) + '</p>' + (d.tags.length ? '<div class="chips">' + d.tags.map(function(t){ return '<span class="chip ' + t[1] + '">' + esc(t[0]) + '</span>'; }).join("") + '</div>' : '')) +
+    (small ? '<p style="font-size:13px">' + esc(d.desc) + '</p>' : '') + '</div></article>';
+}
+function rMenu(){
+  var n = upcoming(), tonight = S.menu === "tonight";
+  var mains = tonight ? (n ? dinnerDishes(n, "main") : []) : DISHES.filter(function(d){ return d.sec === "main"; });
+  var sides = tonight ? (n ? dinnerDishes(n, "side") : []) : DISHES.filter(function(d){ return d.sec === "side"; });
+  var avail = {}; if (n) dinnerDishes(n, "main").concat(dinnerDishes(n, "side")).forEach(function(d){ avail[d.id] = 1; });
+  var h = '<header><p class="eb">' + (n ? 'Cena n. ' + esc(n.number) + ' · ' + esc(KIND[n.kind] || "") : 'La carta') + '</p><h1 class="lt">Il Menu</h1></header>';
+  h += '<div class="seg" role="tablist"><button role="tab" data-act="menu-mode" data-mode="tonight" aria-selected="' + tonight + '">Tonight</button><button role="tab" data-act="menu-mode" data-mode="all" aria-selected="' + (!tonight) + '">Full menu</button></div>';
+  if (tonight && !n) { h += '<div class="empty">No dinner open right now. Have a look at the full menu.</div>'; $("#s-menu").innerHTML = h; return; }
+  h += '<div class="group"><h2 class="mh main"><b>MAIN</b><small>characters</small></h2>' + mains.map(function(d){ return dishCard(d, !tonight && avail[d.id]); }).join("") + '</div>';
+  if (sides.length) h += '<div class="group"><h2 class="mh side"><b>SIDE</b><small>quests</small></h2><div class="sides">' + sides.map(function(d){ return dishCard(d, !tonight && avail[d.id], true); }).join("") + '</div></div>';
+  h += '<div class="group"><h2 class="mh"><b>DRINKS</b></h2><div class="card drinks">' + DRINKS.map(function(d){ return '<div class="drink"><b style="font-weight:600">' + esc(d.name) + '</b>' + (d.note ? '<span>' + esc(d.note) + '</span>' : '') + '</div>'; }).join("") + '</div></div>';
+  $("#s-menu").innerHTML = h;
+}
+
+function ranked(){
+  return S.guests.map(function(g){ return {g:g, n:attended(g.id).length}; }).sort(function(a,b){ return b.n - a.n || String(a.g.name).localeCompare(String(b.g.name)); });
+}
+function rFam(){
+  var r = ranked(), top = r.filter(function(x){ return x.n > 0; }).slice(0,3);
+  var h = '<header><p class="eb">' + plural(S.guests.length, "member", "members") + '</p><h1 class="lt">La Famiglia</h1></header>';
+  if (top.length === 3) {
+    var order = [top[1], top[0], top[2]], col = ["var(--silver)","var(--gold)","var(--bronze)"], pos = [2,1,3], size = [64,84,64];
+    h += '<div class="card podium">' + order.map(function(x, i){
+      return '<button class="pod" data-act="guest" data-id="' + esc(x.g.id) + '"><span class="ring">' + av(x.g, size[i]) + '</span><span class="rank" style="background:' + col[i] + '">' + pos[i] + '</span><span class="nm">' + esc(x.g.name.split(" ")[0]) + '</span><span class="ct">' + plural(x.n, "cena", "cene") + '</span></button>';
+    }).join("") + '</div>';
+  }
+  if (!r.length) h += '<div class="empty">Nobody here yet. Join from the Profilo tab.</div>';
+  else h += '<div class="fam">' + r.map(function(x){
+    return '<button class="mem" data-act="guest" data-id="' + esc(x.g.id) + '">' + av(x.g, 72) + '<span class="nm">' + esc(x.g.name.split(" ")[0]) + '</span>' + (x.g.is_host ? '<span class="host">Host</span>' : '<span class="ct">' + plural(x.n, "cena", "cene") + '</span>') + '</button>';
+  }).join("") + '</div>';
+  $("#s-famiglia").innerHTML = h;
+}
+
+function rArch(){
+  var p = past();
+  var h = '<header><p class="eb">' + plural(p.length, "dinner", "dinners") + ' served</p><h1 class="lt">Archivio</h1></header>';
+  if (!p.length) h += '<div class="empty">The first dinner will appear here.</div>';
+  h += '<div class="arch">' + p.map(function(d){
+    var at = bOf(d.id).filter(function(b){ return b.attended !== false; });
+    var people = at.reduce(function(s,b){ return s + 1 + (b.plus||0); }, 0);
+    var td = topDish(d), ap = approvedOf(d.id);
+    return '<button class="ad" data-act="dinner" data-id="' + esc(d.id) + '"><img src="' + (ap.length ? esc(ap[0].url) : (td ? img(td.id) : "img/hero.jpg")) + '" alt=""><span><span class="t">Cena n. ' + esc(d.number) + ' · ' + esc(KIND[d.kind] || "") + '</span><span class="m">' + esc(d.starts_at ? fDay(d.starts_at) : "") + ' · ' + plural(people, "guest", "guests") + (ap.length ? ' · ' + plural(ap.length, "photo", "photos") : (td ? ' · top: ' + esc(td.name) : '')) + '</span>' + stack(at.map(function(b){ return guest(b.guest_id); }).filter(Boolean), 26, 8) + '</span><span class="chev" aria-hidden="true">›</span></button>';
+  }).join("") + '</div>';
+  $("#s-archivio").innerHTML = h;
+}
+
+function profileHTML(g, isMe){
+  var hist = attended(g.id).map(function(b){ return {b:b, d:S.dinners.filter(function(x){ return x.id === b.dinner_id; })[0]}; }).filter(function(x){ return x.d; }).sort(function(a,b){ return b.d.number - a.d.number; });
+  var n = hist.length, lv = level(n), f = fav(g.id);
+  var h = '<div class="prof"><span class="ring">' + av(g, 108) + '</span><h2>' + esc(g.name) + '</h2>';
+  if (g.instagram) h += '<a class="ig" href="https://instagram.com/' + encodeURIComponent(g.instagram) + '" target="_blank" rel="noopener">@' + esc(g.instagram) + '</a>';
+  h += '<div class="badges">' + (g.is_host ? '<span class="chip r">Host</span>' : '') + '<span class="chip g">' + esc(lv.name) + '</span></div>';
+  if (g.bio) h += '<p class="bio">' + esc(g.bio) + '</p>';
+  h += '</div>';
+  h += '<div class="tiles"><div class="tile"><b>' + n + '</b><span>Cene</span></div><div class="tile text"><b>' + esc(f ? f.name : "Not yet") + '</b><span>Piatto preferito</span></div><div class="tile text"><b>' + esc(lv.name) + '</b><span>Livello</span></div></div>';
+  var nextL = LEVELS.filter(function(l){ return l.min > n; })[0];
+  var stamps = ''; for (var i = 0; i < 10; i++) stamps += '<span class="stamp' + (i < n ? ' on' : '') + '">' + (i < n ? '✓' : i + 1) + '</span>';
+  h += '<div class="group"><div class="sh"><h3>Tessera</h3><span class="side">' + Math.min(n,10) + '/10</span></div><div class="card"><div class="stamps">' + stamps + '</div><p class="lvl">' + (nextL ? plural(nextL.min - n, "more dinner", "more dinners") + ' to <b>' + esc(nextL.name) + '</b>' : 'Top level reached. Grazie di cuore.') + '</p></div></div>';
+  if (isMe) {
+    var b = mine(), u = upcoming();
+    if (b && u) h += '<div class="group"><div class="sh"><h3>Next up</h3></div>' + ticketHTML(b, u, g) + '</div>';
+  }
+  h += '<div class="group"><div class="sh"><h3>Storico</h3><span class="side">' + plural(n, "dinner", "dinners") + '</span></div>';
+  if (!hist.length) h += '<div class="empty">' + (isMe ? "Your first dinner will show up here." : "No dinners yet.") + '</div>';
+  else h += '<div class="card hist">' + hist.map(function(x){
+    var m = D[x.b.main], s = D[x.b.side], dr = DR[x.b.drink];
+    return '<div class="hi"><img src="' + (m ? img(m.id) : "img/hero.jpg") + '" alt=""><div><b>' + esc(m ? m.name : "Dinner") + (s ? ' <em>+ ' + esc(s.name) + '</em>' : '') + '</b><small>Cena n. ' + esc(x.d.number) + ' · ' + esc(x.d.starts_at ? fDay(x.d.starts_at) : "") + (dr ? ' · ' + esc(dr.name) : '') + '</small></div></div>';
+  }).join("") + '</div>';
+  h += '</div>';
+  return h;
+}
+function rMe(){
+  var me = guest(S.meId), h = '';
+  if (!me) {
+    h += '<header><p class="eb">Profilo</p><h1 class="lt">Join La Famiglia</h1></header>';
+    h += '<div class="card join"><span class="flag" aria-hidden="true"><i></i><i></i><i></i></span><h3>Your seat at the table</h3><p>Add your photo, your name and your Instagram. Every dinner you join lands in your history, with the dish you ate.</p><button class="btn primary" data-act="join">Create my profile</button></div>';
+  } else {
+    h += '<header style="display:flex;justify-content:space-between;align-items:center"><p class="eb">Profilo</p><button class="link" data-act="edit">Edit</button></header>';
+    h += profileHTML(me, true);
+  }
+  h += '<p class="fine"><span>OMG = <b>Osteria Matteo &amp; Giovanni</b></span><span>D.O.P. · Denominazione di Origine Polacca</span><span>Food photos: Pexels</span></p>';
+  h += '<button class="link" style="justify-self:center" data-act="admin">' + (S.isAdmin && LIVE ? 'Chef area' : 'Chef area · hosts only') + '</button>';
+  $("#s-me").innerHTML = h;
+}
+function rGuest(){
+  var g = guest(S.gid);
+  var h = '<button class="back" data-act="back">‹ Famiglia</button>';
+  h += g ? profileHTML(g, g.id === S.meId) : '<div class="empty">This profile does not exist anymore.</div>';
+  $("#s-guest").innerHTML = h;
+}
+
+function ticketHTML(b, d, g){
+  var m = D[b.main], s = D[b.side], dr = DR[b.drink];
+  return '<div class="ticket"><div class="tk-h"><div>' + brandHTML() + '<small>Cena n. ' + esc(d.number) + ' · ' + esc(when(d)) + '</small></div><div class="dop">D.O.P.<small>DENOMINAZIONE DI<br>ORIGINE POLACCA</small></div></div><div class="cut"></div>' +
+    '<div class="row"><span>Guest</span><b>' + esc(g ? g.name : "") + (b.plus ? ' +' + b.plus : '') + '</b></div>' +
+    '<div class="row"><span>Main</span><b>' + esc(m ? m.name : "-") + '</b></div>' +
+    (s ? '<div class="row"><span>Side</span><b>' + esc(s.name) + '</b></div>' : '') +
+    '<div class="row"><span>Drink</span><b>' + esc(dr ? dr.name : "-") + '</b></div>' +
+    (b.notes ? '<div class="row"><span>Notes</span><b>' + esc(b.notes) + '</b></div>' : '') +
+    '<div class="row"><span>Bill</span><b>0 zł · paid in smiles</b></div><div class="no">N° ' + tnum(b.id) + '</div></div>';
+}
+
+/* ---------- Sheet ---------- */
+var sheetClose = null;
+function openSheet(title, body, onMount, onClose){
+  $("#sheet").innerHTML = '<div class="grab" aria-hidden="true"></div><div class="sh-top"><h2 id="sheet-title">' + title + '</h2><button class="x" data-act="close" aria-label="Close">✕</button></div>' + body;
+  $("#sheet-wrap").hidden = false; document.body.style.overflow = "hidden";
+  sheetClose = onClose || null;
+  if (onMount) onMount($("#sheet"));
+  var f = $("#sheet input:not([type=hidden]):not([type=file]), #sheet button.btn"); if (f && !("ontouchstart" in window)) f.focus();
+}
+function closeSheet(){
+  $("#sheet-wrap").hidden = true; $("#sheet").innerHTML = ""; document.body.style.overflow = "";
+  var c = sheetClose; sheetClose = null; if (c) c();
+}
+function toast(msg){ var t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(function(){ t.hidden = true; }, 2600); }
+function busy(btn, on, label){ if (!btn) return; if (on) { btn._l = btn.textContent; btn.disabled = true; btn.textContent = label || "Saving…"; } else { btn.disabled = false; if (btn._l) btn.textContent = btn._l; } }
+function niceErr(e){ var m = (e && (e.message || e.error_description)) || String(e); if (/sold out/i.test(m)) return "Sold out, sorry. Every seat is taken."; if (/invalid login credentials/i.test(m)) return "Wrong email or password."; if (/email not confirmed/i.test(m)) return "This email isn't confirmed yet in Supabase."; if (/failed to fetch|load failed|networkerror/i.test(m)) return "No connection. Try again in a moment."; if (/anonymous/i.test(m)) return "Sign-ups are not switched on yet. Tell Matteo."; if (/row-level|permission|policy/i.test(m)) return "Not allowed. This dinner may be closed."; return m; }
+
+/* ---------- Join / edit ---------- */
+function photoBlob(file){
+  return new Promise(function(res, rej){
+    var url = URL.createObjectURL(file), im = new Image();
+    im.onload = function(){
+      var s = Math.min(im.width, im.height), c = document.createElement("canvas"); c.width = c.height = 480;
+      c.getContext("2d").drawImage(im, (im.width - s)/2, (im.height - s)/2, s, s, 0, 0, 480, 480);
+      URL.revokeObjectURL(url);
+      c.toBlob(function(b){ b ? res(b) : rej(new Error("Could not read the photo.")); }, "image/jpeg", 0.85);
+    };
+    im.onerror = function(){ URL.revokeObjectURL(url); rej(new Error("This file is not a photo we can read.")); };
+    im.src = url;
+  });
+}
+function openJoin(thenBook){
+  var me = guest(S.meId), blob = null;
+  var body = '<form id="jf" novalidate>' + (me ? '' : joinTip()) +
+    '<label class="pick" for="j-photo"><span class="pp" id="j-pp">' + (me && me.photo_url ? '<img src="' + esc(me.photo_url) + '" alt="">' : '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.7l1.3-2h5l1.3 2h1.7A2.5 2.5 0 0 1 20 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.5" r="3.6"/></svg>') + '</span>' + (me && me.photo_url ? 'Change photo' : 'Add your photo') + '</label>' +
+    '<input type="file" id="j-photo" accept="image/*" hidden>' +
+    '<div class="field"><label for="j-name">Name</label><input class="in" id="j-name" maxlength="40" autocomplete="given-name" value="' + esc(me ? me.name : "") + '" placeholder="Your name"></div>' +
+    '<div class="field"><label for="j-ig">Instagram</label><div class="igin"><span>@</span><input class="in" id="j-ig" maxlength="80" autocapitalize="off" autocorrect="off" spellcheck="false" value="' + esc(me ? me.instagram || "" : "") + '" placeholder="yourhandle"></div></div>' +
+    '<div class="field"><label for="j-bio">About you</label><textarea class="in" id="j-bio" maxlength="140" rows="3" placeholder="Favourite pasta, where you\'re from, one fun fact">' + esc(me ? me.bio || "" : "") + '</textarea></div>' +
+    (me ? '' : '<label class="check"><input type="checkbox" id="j-ok"><span>I\'m happy for my photo, name and Instagram to be visible to the group.</span></label>') +
+    '<p class="err" id="j-err" hidden></p><button class="btn primary" type="submit">' + (me ? 'Save' : 'Entra nella Famiglia') + '</button></form>';
+  openSheet(me ? "Edit profile" : "Join La Famiglia", body, function(root){
+    $("#j-photo", root).addEventListener("change", function(e){
+      var f = e.target.files && e.target.files[0]; if (!f) return;
+      photoBlob(f).then(function(b){ blob = b; $("#j-pp", root).innerHTML = '<img src="' + URL.createObjectURL(b) + '" alt="">'; }).catch(function(err){ showErr(err.message); });
+    });
+    function showErr(m){ var el = $("#j-err", root); el.textContent = m; el.hidden = false; }
+    $("#jf", root).addEventListener("submit", function(e){
+      e.preventDefault();
+      var name = $("#j-name", root).value.trim(), igRaw = $("#j-ig", root).value.trim(), ig = cleanIg(igRaw), bio = $("#j-bio", root).value.trim();
+      if (!name) return showErr("Add your name, so we know who you are.");
+      if (igRaw && !ig) return showErr("That Instagram handle doesn't look right. Use letters, numbers, dots and underscores.");
+      if (!me && !(blob)) return showErr("Add a photo: it's how the Famiglia recognises you.");
+      if (!me && !$("#j-ok", root).checked) return showErr("Tick the box to confirm you're OK with your profile being visible.");
+      var btn = $("button[type=submit]", root); busy(btn, true);
+      api.join({name:name, instagram:ig || null, bio:bio || null}, blob).then(function(){
+        closeSheet(); render(); toast(me ? "Profile saved." : "Benvenuto/a nella Famiglia!");
+        if (thenBook) setTimeout(openBook, 250);
+      }).catch(function(err){ busy(btn, false); showErr(niceErr(err)); });
+    });
+  });
+}
+
+/* ---------- Prenotazione ---------- */
+function optHTML(name, d, checked){
+  return '<label class="opt"><input type="radio" name="' + name + '" value="' + esc(d.id) + '"' + (checked ? ' checked' : '') + '><span class="o"><img src="' + img(d.id) + '" alt=""><span><b>' + esc(d.name) + '</b><small>' + esc(d.desc) + '</small></span><span class="tick" aria-hidden="true">✓</span></span></label>';
+}
+function openBook(){
+  var n = upcoming(); if (!n) return;
+  if (!S.meId) return openJoin(true);
+  var b = mine(), mains = dinnerDishes(n, "main"), sides = dinnerDishes(n, "side");
+  var body = '<form id="bf" novalidate><p class="note" style="margin-top:-6px">' + esc(KIND[n.kind] || "Dinner") + ' · ' + esc(when(n)) + '</p>' +
+    '<fieldset style="border:0;padding:0;margin:0" class="group" aria-label="Main"><div class="mh main"><b>MAIN</b><small>characters</small></div><div class="opts">' + mains.map(function(d, i){ return optHTML("main", d, b ? b.main === d.id : false); }).join("") + '</div></fieldset>' +
+    (sides.length ? '<fieldset style="border:0;padding:0;margin:0" class="group" aria-label="Side"><div class="mh side"><b>SIDE</b><small>quests</small></div><div class="opts">' + sides.map(function(d){ return optHTML("side", d, b ? b.side === d.id : false); }).join("") + '<label class="opt noimg"><input type="radio" name="side" value=""' + (!b || !b.side ? ' checked' : '') + '><span class="o"><span><b>No side tonight</b></span><span class="tick" aria-hidden="true">✓</span></span></label></div></fieldset>' : '') +
+    '<div class="field"><span class="lab">Drink</span><div class="pills">' + DRINKS.map(function(d){ return '<label class="pl"><input type="radio" name="drink" value="' + d.id + '"' + (b && b.drink === d.id ? ' checked' : '') + '><span>' + esc(d.name) + '</span></label>'; }).join("") + '</div></div>' +
+    '<div class="field"><span class="lab">Bringing someone?</span><div class="pills">' + [0,1,2].map(function(k){ return '<label class="pl"><input type="radio" name="plus" value="' + k + '"' + ((b ? (b.plus||0) : 0) === k ? ' checked' : '') + '><span>' + (k ? '+' + k : 'Just me') + '</span></label>'; }).join("") + '</div></div>' +
+    '<div class="field"><label for="b-notes">Allergies or notes for the chefs</label><input class="in" id="b-notes" maxlength="140" value="' + esc(b ? b.notes || "" : "") + '" placeholder="e.g. no pork, extra pecorino"></div>' +
+    '<p class="err" id="b-err" hidden></p><button class="btn primary" type="submit">' + (b ? 'Update booking' : 'Prenota') + '</button></form>';
+  openSheet("Book your seat", body, function(root){
+    function showErr(m){ var el = $("#b-err", root); el.textContent = m; el.hidden = false; el.scrollIntoView({block:"nearest"}); }
+    $("#bf", root).addEventListener("submit", function(e){
+      e.preventDefault();
+      var fd = new FormData(e.target), main = fd.get("main"), side = fd.get("side") || null, drink = fd.get("drink"), plus = parseInt(fd.get("plus") || "0", 10);
+      if (!main) return showErr("Pick your main character.");
+      if (!drink) return showErr("Pick a drink.");
+      if (taken(n, b && b.id) + 1 + plus > (n.seats || 20)) return showErr("Not enough seats left for that. Try with fewer friends.");
+      var btn = $("button[type=submit]", root); busy(btn, true);
+      api.book(n, {main:main, side:side, drink:drink, plus:plus, notes:($("#b-notes", root).value.trim() || null)}).then(function(){
+        closeSheet(); render(); toast(b ? "Booking updated." : "You're in! See you at the table."); setTimeout(openTicket, 300);
+      }).catch(function(err){ busy(btn, false); showErr(niceErr(err)); });
+    });
+  });
+}
+function openTicket(){
+  var b = mine(), n = upcoming(), me = guest(S.meId); if (!b || !n) return;
+  var open = n.status === "open";
+  openSheet("Your ticket", ticketHTML(b, n, me) + '<div class="grid2" style="margin-top:14px">' + (open ? '<button class="btn soft" data-act="book-edit">Change</button><button class="btn danger" data-act="cancel" data-confirm="1">Cancel</button>' : '') + '</div>');
+}
+
+/* ---------- Foto delle cene ---------- */
+function photosFor(did){ return S.photos.filter(function(p){ return p.dinner_id === did && (p.status === "approved" || (S.meId && p.guest_id === S.meId)); }).sort(function(a,b){ return String(a.created_at).localeCompare(String(b.created_at)); }); }
+function canUpload(d){ if (!S.meId) return false; if (S.isAdmin) return true; return bOf(d.id).some(function(b){ return b.guest_id === S.meId; }); }
+function resizeImg(file, max, q){
+  return new Promise(function(res, rej){
+    var url = URL.createObjectURL(file), im = new Image();
+    im.onload = function(){
+      var k = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement("canvas");
+      c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+      c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+      c.toBlob(function(b){ b ? res(b) : rej(new Error("Could not read a photo.")); }, "image/jpeg", q);
+    };
+    im.onerror = function(){ URL.revokeObjectURL(url); rej(new Error("One of the files is not a photo.")); };
+    im.src = url;
+  });
+}
+function openDinner(id){
+  var d = S.dinners.filter(function(x){ return String(x.id) === String(id); })[0]; if (!d) return;
+  var at = bOf(d.id).filter(function(b){ return b.attended !== false; });
+  var ph = photosFor(d.id), up = canUpload(d);
+  var h = '<p class="note" style="margin-top:-6px">' + esc(KIND[d.kind] || "") + ' · ' + esc(when(d)) + '</p>';
+  h += '<div class="group" style="margin-top:14px"><div class="sh"><h3>Foto</h3><span class="side">' + plural(approvedOf(d.id).length, "photo", "photos") + '</span></div>';
+  if (ph.length) h += '<div class="gal">' + ph.map(function(p){ return '<button data-act="photo" data-id="' + esc(p.id) + '"><img src="' + esc(p.url) + '" alt="Photo from Cena n. ' + esc(d.number) + '" loading="lazy">' + (p.status !== "approved" ? '<span class="pend">Waiting</span>' : '') + '</button>'; }).join("") + '</div>';
+  else h += '<div class="empty">No photos yet.' + (up ? ' Be the first to add some.' : '') + '</div>';
+  if (up) h += '<label class="btn soft" for="ph-in" id="ph-lab" style="cursor:pointer">Add your photos</label><input type="file" id="ph-in" accept="image/*" multiple hidden><p class="note">Up to 10 at a time. The chefs choose which ones go public.</p>';
+  else if (!S.meId) h += '<p class="note">Join La Famiglia to add photos from the dinners you were at.</p>';
+  h += '</div>';
+  h += '<div class="group" style="margin-top:18px"><div class="sh"><h3>A tavola</h3><span class="side">' + plural(at.reduce(function(s,b){ return s + 1 + (b.plus||0); }, 0), "guest", "guests") + '</span></div><div class="card list">' + (at.length ? at.map(function(b){
+    var g = guest(b.guest_id), m = D[b.main], s = D[b.side];
+    if (!g) return "";
+    return '<button class="li" style="border-left:0;border-right:0;border-bottom:0;background:none;text-align:left;width:100%" data-act="guest" data-id="' + esc(g.id) + '">' + av(g, 40) + '<span><b>' + esc(g.name) + (b.plus ? ' +' + b.plus : '') + '</b><small>' + esc(m ? m.name : "") + (s ? ' + ' + esc(s.name) : '') + '</small></span><span class="chev">›</span></button>';
+  }).join("") : '<div class="empty" style="border:0">No guests recorded.</div>') + '</div></div>';
+  openSheet("Cena n. " + esc(d.number), h, function(root){
+    var inp = $("#ph-in", root); if (!inp) return;
+    inp.addEventListener("change", function(e){
+      var files = Array.prototype.slice.call(e.target.files || []).slice(0, 10); if (!files.length) return;
+      var lab = $("#ph-lab", root); lab.textContent = "Uploading " + plural(files.length, "photo", "photos") + "…"; lab.style.pointerEvents = "none";
+      Promise.all(files.map(function(f){ return resizeImg(f, LIVE ? 1600 : 900, LIVE ? 0.82 : 0.7); }))
+        .then(function(blobs){ return api.uploadPhotos(d, blobs); })
+        .then(function(){ render(); openDinner(d.id); toast(S.isAdmin ? "Uploaded. Publish them from the Chef area." : "Sent! The chefs choose which ones go public."); })
+        .catch(function(err){ lab.textContent = "Add your photos"; lab.style.pointerEvents = ""; toast(niceErr(err)); });
+    });
+  });
+}
+function openPhoto(id){
+  var p = S.photos.filter(function(x){ return String(x.id) === String(id); })[0]; if (!p) return;
+  var d = S.dinners.filter(function(x){ return x.id === p.dinner_id; })[0], g = guest(p.guest_id);
+  openSheet(d ? "Cena n. " + esc(d.number) : "Photo", '<img class="full" src="' + esc(p.url) + '" alt="">' +
+    '<p class="note" style="margin-top:10px">' + (g ? 'By ' + esc(g.name) : '') + (p.status !== "approved" ? ' · waiting for the chefs' : '') + '</p>' +
+    (d ? '<button class="btn soft" style="margin-top:12px" data-act="dinner" data-id="' + esc(d.id) + '">Back to the dinner</button>' : ''));
+}
+function modCard(p, pending){
+  var d = S.dinners.filter(function(x){ return x.id === p.dinner_id; })[0], g = guest(p.guest_id);
+  return '<figure><button data-act="photo" data-id="' + esc(p.id) + '" style="border:0;padding:0;display:block;width:100%"><img src="' + esc(p.url) + '" alt=""></button><figcaption><span>Cena n. ' + (d ? esc(d.number) : "?") + ' · ' + esc(g ? g.name : "?") + '</span><span class="acts">' +
+    (pending ? '<button class="mini on" data-act="approve" data-id="' + esc(p.id) + '">Publish</button>' : '<button class="mini" data-act="hide-photo" data-id="' + esc(p.id) + '">Hide</button>') +
+    '<button class="mini del" data-act="del-photo" data-id="' + esc(p.id) + '" data-confirm="1">Delete</button></span></figcaption></figure>';
+}
+
+/* ---------- Chef area ---------- */
+var adminTab = "dinner";
+function toLocal(iso){ if (!iso) return ""; var d = new Date(iso); var p = function(x){ return String(x).padStart(2, "0"); }; return d.getFullYear() + "-" + p(d.getMonth()+1) + "-" + p(d.getDate()) + "T" + p(d.getHours()) + ":" + p(d.getMinutes()); }
+function openAdmin(){
+  if (LIVE && !S.isAdmin) {
+    var body = '<form id="lf" novalidate><p class="note">Only Matteo and Giovanni can enter.</p><div class="field"><label for="l-email">Email</label><input class="in" id="l-email" type="email" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="you@email.com"></div><div class="field"><label for="l-pass">Password</label><input class="in" id="l-pass" type="password" autocomplete="current-password"></div><p class="err" id="l-err" hidden></p><button class="btn primary" type="submit">Log in</button>' + (S.email ? '<button class="btn soft" type="button" data-act="logout">Log out (' + esc(S.email) + ')</button>' : '') + '</form>';
+    openSheet("Chef area", body, function(root){
+      $("#lf", root).addEventListener("submit", function(e){
+        e.preventDefault(); var em = $("#l-email", root).value.trim(), pw = $("#l-pass", root).value, btn = $("button[type=submit]", root), er = $("#l-err", root);
+        function fail(m){ busy(btn, false); er.textContent = m; er.hidden = false; }
+        if (!/^\S+@\S+\.\S+$/.test(em)) return fail("Type a valid email.");
+        if (!pw) return fail("Type your password.");
+        er.hidden = true; busy(btn, true, "Logging in…");
+        api.login(em, pw).then(function(){ render(); if (S.isAdmin) openAdmin(); else fail("This account isn't on the chefs list."); }).catch(function(err){ fail(niceErr(err)); });
+      });
+    }, leaveAdmin);
+    return;
+  }
+  openSheet("Chef area", '<div class="seg" role="tablist" style="grid-template-columns:repeat(5,1fr)">' + [["dinner","Dinner"],["bookings","Bookings"],["shop","Spesa"],["photos","Foto" + (S.photos.filter(function(p){ return p.status !== "approved"; }).length ? " ·" + S.photos.filter(function(p){ return p.status !== "approved"; }).length : "")],["guests","Guests"]].map(function(t){ return '<button role="tab" data-act="admin-tab" data-tab="' + t[0] + '" aria-selected="' + (adminTab === t[0]) + '">' + t[1] + '</button>'; }).join("") + '</div><div id="adm" style="margin-top:16px;display:grid;gap:16px"></div>', function(){ rAdmin(); }, leaveAdmin);
+}
+function leaveAdmin(){ if (location.hash === "#admin") location.hash = S.last || "me"; }
+function rAdmin(){
+  var el = $("#adm"); if (!el) return;
+  $$('[data-act="admin-tab"]').forEach(function(b){ b.setAttribute("aria-selected", String(b.dataset.tab === adminTab)); });
+  var n = upcoming(), h = '';
+  if (!LIVE) h += '<p class="note">Demo: in the live app only Matteo and Giovanni get in here, with email and password.</p>';
+  if (adminTab === "dinner") {
+    var d = n || {number: (S.dinners.reduce(function(m,x){ return Math.max(m, x.number); }, 0) + 1), kind:"pasta", seats:20, dishes:["carbonara","amatriciana","patate"], status:"open", starts_at:null};
+    var sel = {}; (d.dishes || []).forEach(function(id){ sel[id] = 1; });
+    h += '<form id="df" novalidate><p class="note">' + (n ? 'Editing the next dinner.' : 'No dinner open: create the next one.') + '</p>' +
+      '<div class="grid2"><div class="field"><label for="d-num">Cena n.</label><input class="in" id="d-num" type="number" min="1" value="' + esc(d.number) + '"></div><div class="field"><label for="d-seats">Seats</label><input class="in" id="d-seats" type="number" min="1" max="60" value="' + esc(d.seats || 20) + '"></div></div>' +
+      '<div class="field"><label for="d-when">Date and time</label><input class="in" id="d-when" type="datetime-local" value="' + esc(toLocal(d.starts_at)) + '"></div>' +
+      '<div class="grid2"><div class="field"><label for="d-kind">Type</label><select class="in" id="d-kind">' + Object.keys(KIND).map(function(k){ return '<option value="' + k + '"' + (d.kind === k ? ' selected' : '') + '>' + KIND[k] + '</option>'; }).join("") + '</select></div><div class="field"><label for="d-status">Bookings</label><select class="in" id="d-status"><option value="open"' + (d.status === "open" ? " selected" : "") + '>Open</option><option value="closed"' + (d.status === "closed" ? " selected" : "") + '>Closed</option></select></div></div>' +
+      '<div class="field"><span class="lab">MAIN tonight</span><div class="pills">' + DISHES.filter(function(x){ return x.sec === "main"; }).map(function(x){ return '<label class="pl"><input type="checkbox" name="dish" value="' + x.id + '"' + (sel[x.id] ? ' checked' : '') + '><span>' + esc(x.name) + '</span></label>'; }).join("") + '</div></div>' +
+      '<div class="field"><span class="lab">SIDE tonight</span><div class="pills">' + DISHES.filter(function(x){ return x.sec === "side"; }).map(function(x){ return '<label class="pl"><input type="checkbox" name="dish" value="' + x.id + '"' + (sel[x.id] ? ' checked' : '') + '><span>' + esc(x.name) + '</span></label>'; }).join("") + '</div></div>' +
+      '<p class="err" id="d-err" hidden></p><button class="btn primary" type="submit">' + (n ? 'Save dinner' : 'Create dinner') + '</button></form>';
+    if (n) h += '<button class="btn danger" data-act="close-dinner" data-confirm="1">Dinner done · move it to the Archivio</button>';
+  }
+  if (adminTab === "bookings") {
+    if (!n) h += '<div class="empty">No dinner open.</div>';
+    else {
+      var bs = bOf(n.id);
+      h += '<p class="note">Cena n. ' + esc(n.number) + ' · ' + plural(taken(n), "seat", "seats") + ' of ' + (n.seats||20) + '. Untick whoever doesn\'t show up: they won\'t get the stamp.</p>';
+      h += '<div class="card list">' + (bs.length ? bs.map(function(b){
+        var g = guest(b.guest_id), m = D[b.main], s = D[b.side], dr = DR[b.drink];
+        return '<div class="li">' + av(g || {id:b.guest_id, name:"?"}, 40) + '<span><b>' + esc(g ? g.name : "Unknown") + (b.plus ? ' +' + b.plus : '') + '</b><small>' + esc([m && m.name, s && s.name, dr && dr.name].filter(Boolean).join(" · ")) + (b.notes ? ' · ' + esc(b.notes) : '') + '</small></span><span class="acts"><button class="mini' + (b.attended !== false ? ' on' : '') + '" data-act="att" data-id="' + esc(b.id) + '">' + (b.attended !== false ? 'Here' : 'No-show') + '</button><button class="mini del" data-act="del-b" data-id="' + esc(b.id) + '" data-confirm="1">✕</button></span></div>';
+      }).join("") : '<div class="empty" style="border:0">No bookings yet.</div>') + '</div>';
+    }
+  }
+  if (adminTab === "shop") {
+    if (!n) h += '<div class="empty">No dinner open.</div>';
+    else {
+      var bs2 = bOf(n.id).filter(function(b){ return b.attended !== false; }), cnt = {}, dcnt = {}, pasta = 0, pinsa = 0, ppl = 0;
+      bs2.forEach(function(b){ var k = 1 + (b.plus||0); ppl += k; if (b.main) cnt[b.main] = (cnt[b.main]||0) + k; if (b.side) cnt[b.side] = (cnt[b.side]||0) + k; if (b.drink) dcnt[b.drink] = (dcnt[b.drink]||0) + k; var m = D[b.main]; if (m && m.kind === "pasta") pasta += k; if (m && m.kind === "pinsa") pinsa += k; });
+      h += '<div class="tiles"><div class="tile"><b>' + ppl + '</b><span>People</span></div><div class="tile"><b>' + (pasta * 0.11).toFixed(1) + '</b><span>Kg pasta</span></div><div class="tile"><b>' + Math.ceil(pinsa / 2) + '</b><span>Pinsa bases</span></div></div>';
+      h += '<div class="card shop"><b style="margin-bottom:4px">Dishes</b>' + (Object.keys(cnt).length ? Object.keys(cnt).sort(function(a,b){ return cnt[b]-cnt[a]; }).map(function(id){ return '<div class="row"><span>' + esc(D[id] ? D[id].name : id) + '</span><b>' + cnt[id] + '</b></div>'; }).join("") : '<p class="note">Nothing yet.</p>') + '</div>';
+      var drinkLine = {rosso:function(k){ return Math.ceil(k/3) + " bottles"; }, bianco:function(k){ return Math.ceil(k/3) + " bottles"; }, spritz:function(k){ return Math.ceil(k/6) + " Aperol + " + Math.ceil(k/4) + " prosecco"; }, negroni:function(k){ return Math.ceil(k/12) + " each: gin, Campari, vermouth"; }, birra:function(k){ return (k*3) + " cans"; }, limoncello:function(k){ return Math.ceil(k/15) + " bottle"; }, zero:function(k){ return k + " litres"; }};
+      h += '<div class="card shop"><b style="margin-bottom:4px">Drinks (rough)</b>' + (Object.keys(dcnt).length ? Object.keys(dcnt).map(function(id){ return '<div class="row"><span>' + esc(DR[id] ? DR[id].name : id) + ' · ' + dcnt[id] + '</span><b>' + esc(drinkLine[id] ? drinkLine[id](dcnt[id]) : dcnt[id]) + '</b></div>'; }).join("") : '<p class="note">Nothing yet.</p>') + '</div>';
+      h += '<p class="note">Pasta: 110 g per person. Pizza: one pinsa base every two people.</p>';
+    }
+  }
+  if (adminTab === "photos") {
+    var pend = S.photos.filter(function(p){ return p.status !== "approved"; }), appr = S.photos.filter(function(p){ return p.status === "approved"; });
+    h += '<p class="note">Photos uploaded by the Famiglia. Nothing goes public until you publish it.</p>';
+    h += '<div class="sh"><h3>Waiting</h3><span class="side">' + pend.length + '</span></div>';
+    h += pend.length ? '<div class="mod">' + pend.map(function(p){ return modCard(p, true); }).join("") + '</div>' : '<div class="empty">Nothing to review.</div>';
+    h += '<div class="sh"><h3>Published</h3><span class="side">' + appr.length + '</span></div>';
+    h += appr.length ? '<div class="mod">' + appr.map(function(p){ return modCard(p, false); }).join("") + '</div>' : '<div class="empty">No published photos yet.</div>';
+  }
+  if (adminTab === "guests") {
+    h += '<div class="card list">' + (S.guests.length ? ranked().map(function(x){
+      return '<div class="li">' + av(x.g, 40) + '<span><b>' + esc(x.g.name) + '</b><small>' + plural(x.n, "dinner", "dinners") + (x.g.instagram ? ' · @' + esc(x.g.instagram) : '') + '</small></span><span class="acts"><button class="mini' + (x.g.is_host ? ' on' : '') + '" data-act="host" data-id="' + esc(x.g.id) + '">Host</button><button class="mini del" data-act="del-g" data-id="' + esc(x.g.id) + '" data-confirm="1">✕</button></span></div>';
+    }).join("") : '<div class="empty" style="border:0">No members yet.</div>') + '</div>';
+    if (!LIVE) h += '<button class="btn soft" data-act="reset-demo" data-confirm="1">Reset demo data</button>';
+    if (LIVE) h += '<button class="btn soft" data-act="logout">Log out</button>';
+  }
+  el.innerHTML = h;
+  var df = $("#df");
+  if (df) df.addEventListener("submit", function(e){
+    e.preventDefault();
+    var num = parseInt($("#d-num").value, 10), seats = parseInt($("#d-seats").value, 10), w = $("#d-when").value;
+    var dishes = $$('input[name="dish"]:checked', df).map(function(i){ return i.value; });
+    var er = $("#d-err");
+    if (!num || num < 1) { er.textContent = "Add the dinner number."; er.hidden = false; return; }
+    if (!dishes.some(function(id){ return D[id] && D[id].sec === "main"; })) { er.textContent = "Pick at least one main."; er.hidden = false; return; }
+    var btn = $("button[type=submit]", df); busy(btn, true);
+    api.saveDinner({id: n ? n.id : null, number:num, seats:seats || 20, starts_at: w ? new Date(w).toISOString() : null, kind:$("#d-kind").value, status:$("#d-status").value, dishes:dishes})
+      .then(function(){ busy(btn, false); render(); rAdmin(); toast("Dinner saved."); })
+      .catch(function(err){ busy(btn, false); er.textContent = niceErr(err); er.hidden = false; });
+  });
+}
+
+/* ---------- Azioni ---------- */
+function run(p, ok){ return p.then(function(){ render(); if ($("#adm")) rAdmin(); if (ok) toast(ok); }).catch(function(e){ toast(niceErr(e)); }); }
+document.addEventListener("click", function(e){
+  var el = e.target.closest("[data-act]"); if (!el) {
+    if (e.target === $("#sheet-wrap")) closeSheet();
+    return;
+  }
+  if (el.dataset.confirm && !el.dataset.armed) { el.dataset.armed = "1"; el._t = el.textContent; el.textContent = "Tap again"; setTimeout(function(){ if (el.isConnected) { delete el.dataset.armed; el.textContent = el._t; } }, 3000); return; }
+  var a = el.dataset.act, id = el.dataset.id;
+  if (a === "close") return closeSheet();
+  if (a === "join") return openJoin(false);
+  if (a === "join-book") return openJoin(true);
+  if (a === "edit") return openJoin(false);
+  if (a === "book") return openBook();
+  if (a === "book-edit") { closeSheet(); return setTimeout(openBook, 200); }
+  if (a === "ticket") return openTicket();
+  if (a === "cancel") { var b = mine(); if (b) run(api.cancel(b), "Booking cancelled.").then(closeSheet); return; }
+  if (a === "guest") { if (!$("#sheet-wrap").hidden) closeSheet(); location.hash = "guest-" + id; return; }
+  if (a === "back") { location.hash = "famiglia"; return; }
+  if (a === "dinner") return openDinner(id);
+  if (a === "menu-mode") { S.menu = el.dataset.mode; return rMenu(); }
+  if (a === "admin") { location.hash = "admin"; return; }
+  if (a === "admin-tab") { adminTab = el.dataset.tab; return rAdmin(); }
+  if (a === "att") { var bb = S.bookings.filter(function(x){ return String(x.id) === id; })[0]; if (bb) run(api.setAttended(bb, bb.attended === false)); return; }
+  if (a === "del-b") { var b2 = S.bookings.filter(function(x){ return String(x.id) === id; })[0]; if (b2) run(api.delBooking(b2), "Booking removed."); return; }
+  if (a === "close-dinner") { var n = upcoming(); if (n) run(api.saveDinner({id:n.id, number:n.number, seats:n.seats, starts_at:n.starts_at, kind:n.kind, dishes:n.dishes, status:"done"}), "Moved to the Archivio. Stamps added."); return; }
+  if (a === "host") { var g = guest(id); if (g) run(api.setHost(g, !g.is_host)); return; }
+  if (a === "del-g") { var g2 = guest(id); if (g2) run(api.delGuest(g2), "Member removed."); return; }
+  if (a === "photo") return openPhoto(id);
+  if (a === "approve" || a === "hide-photo") { var ph = S.photos.filter(function(x){ return String(x.id) === id; })[0]; if (ph) run(api.setPhoto(ph, a === "approve" ? "approved" : "pending"), a === "approve" ? "Published." : "Hidden from the Archivio."); return; }
+  if (a === "del-photo") { var ph2 = S.photos.filter(function(x){ return String(x.id) === id; })[0]; if (ph2) run(api.delPhoto(ph2), "Photo deleted."); return; }
+  if (a === "reset-demo") { run(api.resetDemo(), "Demo data reset."); return; }
+  if (a === "logout") { run(api.logout(), "Logged out.").then(closeSheet); return; }
+});
+document.addEventListener("keydown", function(e){ if (e.key === "Escape" && !$("#sheet-wrap").hidden) closeSheet(); });
+
+function route(){
+  var h = (location.hash || "#home").slice(1);
+  var tabs = ["home","menu","famiglia","archivio","me"];
+  if (h === "admin") { if (!S.ready) return; render(); if (!$("#adm") && !$("#lf")) { if (!$("#sheet-wrap").hidden) closeSheet(); openAdmin(); } return; }
+  if (tabs.indexOf(h) >= 0) { S.screen = h; S.last = h; }
+  else if (h.indexOf("guest-") === 0) { S.screen = "guest"; S.gid = h.slice(6); }
+  else { S.screen = "home"; S.last = "home"; }
+  if (!$("#sheet-wrap").hidden && !$("#adm")) closeSheet();
+  render(); window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", route);
+
+/* ---------- Dati: demo ---------- */
+var LS = "omg-warsauce-demo-v2";
+function rng(seed){ return function(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function seed(){
+  var r = rng(7), now = new Date();
+  var people = [["Matteo","Co-founder. Carbonara purist.",true],["Giovanni","Co-founder. Lord of the ragù.",true],["Ola","Came for the pasta, stayed for the people."],["Kasia","Team carbonara forever."],["Zuzia","Will fight you for the last pinsa."],["Marta","Learning Italian one dinner at a time."],["Julia","Pesto or nothing."],["Bartek","Brings the beer, takes the leftovers."],["Weronika","Lasagne over everything."],["Natalia","First time here? Never again first."]];
+  var guests = people.map(function(p, i){ return {id:"demo" + i, name:p[0], bio:p[1], instagram:null, photo_url:null, is_host:!!p[2], created_at:now.toISOString()}; });
+  var plans = [["pasta",["carbonara","amatriciana","patate"]],["pizza",["pizza","bruschette","verdure"]],["pasta",["ragu","aglio-olio","contorno"]],["pizza",["pizza","bruschette","patate"]],["pasta",["tortellini","carbonara","verdure"]],["mixed",["amatriciana","pizza","patate"]]];
+  var dinners = [], bookings = [], bid = 0;
+  plans.forEach(function(p, i){
+    var dt = new Date(now.getTime() - (plans.length - i) * 7 * 864e5); dt.setHours(20, 0, 0, 0);
+    var d = {id:"dd" + (i+1), number:i+1, starts_at:dt.toISOString(), kind:p[0], seats:20, dishes:p[1], status:"done"};
+    dinners.push(d);
+    var mainsD = p[1].filter(function(x){ return D[x].sec === "main"; }), sidesD = p[1].filter(function(x){ return D[x].sec === "side"; });
+    guests.forEach(function(g){
+      if (!g.is_host && r() < 0.35) return;
+      bookings.push({id:"bb" + (++bid), dinner_id:d.id, guest_id:g.id, main:mainsD[Math.floor(r()*mainsD.length)], side:sidesD.length && r() < 0.6 ? sidesD[0] : null, drink:DRINKS[Math.floor(r()*DRINKS.length)].id, plus:r() < 0.12 ? 1 : 0, notes:null, attended:r() > 0.06});
+    });
+  });
+  var nd = new Date(now.getTime() + 3 * 864e5); nd.setHours(20, 0, 0, 0);
+  var next = {id:"dd7", number:7, starts_at:nd.toISOString(), kind:"pasta", seats:20, dishes:["carbonara","amatriciana","ragu","tortellini","patate","verdure"], status:"open"};
+  dinners.push(next);
+  ["demo0","demo1","demo3","demo4","demo6","demo8"].forEach(function(gid, i){
+    bookings.push({id:"bb" + (++bid), dinner_id:"dd7", guest_id:gid, main:["carbonara","ragu","carbonara","amatriciana","tortellini","carbonara"][i], side:i % 2 ? "patate" : null, drink:["rosso","birra","spritz","spritz","bianco","rosso"][i], plus:i === 3 ? 1 : 0, notes:null, attended:true});
+  });
+  return {guests:guests, dinners:dinners, bookings:bookings, photos:[], meId:null};
+}
+function blobURL(b){ return new Promise(function(res){ var fr = new FileReader(); fr.onload = function(){ res(fr.result); }; fr.readAsDataURL(b); }); }
+var Demo = {
+  init: function(){ var d = null; try { d = JSON.parse(localStorage.getItem(LS) || "null"); } catch(e){} if (!d || !d.guests) d = seed(); S.guests = d.guests; S.dinners = d.dinners; S.bookings = d.bookings; S.photos = d.photos || []; S.meId = d.meId || null; S.isAdmin = true; return Promise.resolve(); },
+  save: function(){ try { localStorage.setItem(LS, JSON.stringify({guests:S.guests, dinners:S.dinners, bookings:S.bookings, photos:S.photos, meId:S.meId})); return true; } catch(e){ return false; } },
+  uploadPhotos: function(d, blobs){ var self = this; return Promise.all(blobs.map(blobURL)).then(function(urls){
+      urls.forEach(function(u, i){ S.photos.push({id:"ph" + Date.now().toString(36) + i, dinner_id:d.id, guest_id:S.meId, url:u, path:"", status:"pending", created_at:new Date().toISOString()}); });
+      if (!self.save()) throw new Error("Demo storage is full on this phone. Delete some photos from the Chef area."); }); },
+  setPhoto: function(p, st){ p.status = st; this.save(); return Promise.resolve(); },
+  delPhoto: function(p){ S.photos = S.photos.filter(function(x){ return x.id !== p.id; }); this.save(); return Promise.resolve(); },
+  join: function(p, blob){ var self = this; return (blob ? new Promise(function(res){ var fr = new FileReader(); fr.onload = function(){ res(fr.result); }; fr.readAsDataURL(blob); }) : Promise.resolve(null)).then(function(photo){
+      var g = guest(S.meId);
+      if (g) { g.name = p.name; g.instagram = p.instagram; g.bio = p.bio; if (photo) g.photo_url = photo; }
+      else { var id = "me" + Date.now().toString(36); S.guests.push({id:id, name:p.name, instagram:p.instagram, bio:p.bio, photo_url:photo, is_host:false, created_at:new Date().toISOString()}); S.meId = id; }
+      self.save(); }); },
+  book: function(n, c){ var b = mine(); if (b) { for (var k in c) b[k] = c[k]; } else { var nb = {id:"bb" + Date.now().toString(36), dinner_id:n.id, guest_id:S.meId, attended:true}; for (var k2 in c) nb[k2] = c[k2]; S.bookings.push(nb); } this.save(); return Promise.resolve(); },
+  cancel: function(b){ S.bookings = S.bookings.filter(function(x){ return x.id !== b.id; }); this.save(); return Promise.resolve(); },
+  delBooking: function(b){ return this.cancel(b); },
+  saveDinner: function(d){ if (d.id) { var x = S.dinners.filter(function(y){ return y.id === d.id; })[0]; for (var k in d) x[k] = d[k]; } else { d.id = "dd" + Date.now().toString(36); S.dinners.push(d); } this.save(); return Promise.resolve(); },
+  setAttended: function(b, v){ b.attended = v; this.save(); return Promise.resolve(); },
+  setHost: function(g, v){ g.is_host = v; this.save(); return Promise.resolve(); },
+  delGuest: function(g){ S.guests = S.guests.filter(function(x){ return x.id !== g.id; }); S.bookings = S.bookings.filter(function(b){ return b.guest_id !== g.id; }); S.photos = S.photos.filter(function(p){ return p.guest_id !== g.id; }); if (S.meId === g.id) S.meId = null; this.save(); return Promise.resolve(); },
+  resetDemo: function(){ try { localStorage.removeItem(LS); } catch(e){} return this.init(); },
+  login: function(){ return Promise.resolve(); }, logout: function(){ return Promise.resolve(); }
+};
+
+/* ---------- Dati: Supabase (versione live) ---------- */
+var sb = null;
+function loadScript(src){ return new Promise(function(res, rej){ var s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = function(){ rej(new Error("Could not load " + src)); }; document.head.appendChild(s); }); }
+function chk(r){ if (r && r.error) throw r.error; return r; }
+var Live = {
+  init: function(){
+    var self = this;
+    return loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js").then(function(){
+      sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, {auth:{flowType:"pkce", persistSession:true, detectSessionInUrl:true}});
+      return self.reload();
+    }).then(function(){
+      var re = function(){ self.reload().then(render).catch(function(){}); };
+      sb.channel("omg").on("postgres_changes", {event:"*", schema:"public", table:"bookings"}, re).on("postgres_changes", {event:"*", schema:"public", table:"guests"}, re).on("postgres_changes", {event:"*", schema:"public", table:"dinners"}, re).on("postgres_changes", {event:"*", schema:"public", table:"photos"}, re).subscribe();
+      sb.auth.onAuthStateChange(function(){ setTimeout(re, 0); });
+      document.addEventListener("visibilitychange", function(){ if (!document.hidden) re(); });
+    });
+  },
+  reload: function(){
+    return Promise.all([sb.auth.getSession(), sb.from("guests").select("*"), sb.from("dinners").select("*"), sb.from("bookings").select("*"), sb.from("photos").select("*")]).then(function(r){
+      chk(r[1]); chk(r[2]); chk(r[3]); chk(r[4]);
+      var session = r[0].data.session, uid = session ? session.user.id : null;
+      S.guests = r[1].data; S.dinners = r[2].data; S.bookings = r[3].data; S.photos = r[4].data;
+      S.meId = uid && S.guests.some(function(g){ return g.id === uid; }) ? uid : null;
+      S.email = session && session.user.email ? session.user.email : null;
+      if (!S.email) { S.isAdmin = false; return; }
+      return sb.rpc("is_admin").then(function(x){ S.isAdmin = !!(x && x.data); });
+    });
+  },
+  uid: function(){ return sb.auth.getSession().then(function(r){ if (r.data.session) return r.data.session.user.id; return sb.auth.signInAnonymously().then(function(x){ chk(x); return x.data.user.id; }); }); },
+  join: function(p, blob){
+    var self = this;
+    return this.uid().then(function(uid){
+      var row = {id:uid, name:p.name, instagram:p.instagram, bio:p.bio};
+      var up = blob ? sb.storage.from("avatars").upload(uid + "/avatar-" + Date.now() + ".jpg", blob, {contentType:"image/jpeg", upsert:true}).then(function(x){ chk(x); row.photo_url = sb.storage.from("avatars").getPublicUrl(x.data.path).data.publicUrl; }) : Promise.resolve();
+      return up.then(function(){ return sb.from("guests").upsert(row); }).then(chk);
+    }).then(function(){ return self.reload(); });
+  },
+  book: function(n, c){ var self = this, row = {dinner_id:n.id, guest_id:S.meId}; for (var k in c) row[k] = c[k]; return sb.from("bookings").upsert(row, {onConflict:"dinner_id,guest_id"}).then(chk).then(function(){ return self.reload(); }); },
+  cancel: function(b){ var self = this; return sb.from("bookings").delete().eq("id", b.id).then(chk).then(function(){ return self.reload(); }); },
+  delBooking: function(b){ return this.cancel(b); },
+  saveDinner: function(d){ var self = this, row = {number:d.number, starts_at:d.starts_at, kind:d.kind, seats:d.seats, dishes:d.dishes, status:d.status}; return (d.id ? sb.from("dinners").update(row).eq("id", d.id) : sb.from("dinners").insert(row)).then(chk).then(function(){ return self.reload(); }); },
+  setAttended: function(b, v){ var self = this; return sb.from("bookings").update({attended:v}).eq("id", b.id).then(chk).then(function(){ return self.reload(); }); },
+  setHost: function(g, v){ var self = this; return sb.from("guests").update({is_host:v}).eq("id", g.id).then(chk).then(function(){ return self.reload(); }); },
+  delGuest: function(g){ var self = this; return sb.from("guests").delete().eq("id", g.id).then(chk).then(function(){ return self.reload(); }); },
+  uploadPhotos: function(d, blobs){
+    var self = this, uid = S.meId;
+    return blobs.reduce(function(p, b, i){ return p.then(function(){
+      var path = uid + "/" + d.id + "/" + Date.now() + "-" + i + ".jpg";
+      return sb.storage.from("dinner-photos").upload(path, b, {contentType:"image/jpeg"}).then(function(x){
+        chk(x); var url = sb.storage.from("dinner-photos").getPublicUrl(x.data.path).data.publicUrl;
+        return sb.from("photos").insert({dinner_id:d.id, guest_id:uid, url:url, path:x.data.path}).then(chk);
+      });
+    }); }, Promise.resolve()).then(function(){ return self.reload(); });
+  },
+  setPhoto: function(p, st){ var self = this; return sb.from("photos").update({status:st}).eq("id", p.id).then(chk).then(function(){ return self.reload(); }); },
+  delPhoto: function(p){ var self = this; return sb.from("photos").delete().eq("id", p.id).then(chk).then(function(){ return p.path ? sb.storage.from("dinner-photos").remove([p.path]) : null; }).then(function(){ return self.reload(); }); },
+  login: function(email, pw){ var self = this; return sb.auth.signInWithPassword({email:email, password:pw}).then(chk).then(function(){ return self.reload(); }); },
+  logout: function(){ var self = this; return sb.auth.signOut().then(function(){ return self.reload(); }); },
+  resetDemo: function(){ return Promise.resolve(); }
+};
+
+var api = LIVE ? Live : Demo;
+api.init().then(function(){ S.ready = true; route(); })
+  .catch(function(e){ S.ready = true; $("#s-home").innerHTML = '<div class="empty" style="margin-top:40px">Could not load the app. ' + esc(niceErr(e)) + '</div>'; });
+})();
+</script>
+</body>
+</html>
